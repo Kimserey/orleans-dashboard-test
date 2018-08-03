@@ -37,7 +37,7 @@ namespace OrleansDashboardTest.Web
             });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
@@ -51,6 +51,16 @@ namespace OrleansDashboardTest.Web
             });
 
             app.UseMvc();
+
+            logger.LogInformation(@"
+  _____            _     _                         _   _______        _      _____ _ _            _   
+ |  __ \          | |   | |                       | | |__   __|      | |    / ____| (_)          | |  
+ | |  | | __ _ ___| |__ | |__   ___   __ _ _ __ __| |    | | ___  ___| |_  | |    | |_  ___ _ __ | |_ 
+ | |  | |/ _` / __| '_ \| '_ \ / _ \ / _` | '__/ _` |    | |/ _ \/ __| __| | |    | | |/ _ \ '_ \| __|
+ | |__| | (_| \__ \ | | | |_) | (_) | (_| | | | (_| |    | |  __/\__ \ |_  | |____| | |  __/ | | | |_ 
+ |_____/ \__,_|___/_| |_|_.__/ \___/ \__,_|_|  \__,_|    |_|\___||___/\__|  \_____|_|_|\___|_| |_|\__|
+                                                                                                      
+");
         }
     }
 }
