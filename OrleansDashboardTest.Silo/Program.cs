@@ -11,6 +11,10 @@ namespace OrleansDashboardTest.Silo
         static void Main(string[] args)
         {
             ISiloHost host = new SiloHostBuilder()
+                .UseDashboard(opts => {
+                    opts.HostSelf = true;
+                    opts.Port = 5800;
+                })
                 .UseLocalhostClustering()
                 .AddMemoryGrainStorageAsDefault()
                 .UseInMemoryReminderService()
