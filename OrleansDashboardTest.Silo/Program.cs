@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using Orleans;
-using Orleans.Hosting;
-using OrleansDashboardTest.Grains;
+﻿using Microsoft.Extensions.Configuration;
+using Serilog;
 using System;
 
 namespace OrleansDashboardTest.Silo
@@ -10,37 +8,24 @@ namespace OrleansDashboardTest.Silo
     {
         static void Main(string[] args)
         {
-            ISiloHost host = new SiloHostBuilder()
-                .UseDashboard(opts => {
-                    opts.HostSelf = true;
-                    opts.Port = 5800;
-                })
-                .UseLocalhostClustering()
-                .AddMemoryGrainStorageAsDefault()
-                .UseInMemoryReminderService()
-                .ConfigureApplicationParts(x =>
-                {
-                    x.AddApplicationPart(typeof(AccountGrain).Assembly).WithReferences();
-                })
-                .ConfigureLogging(x => x.AddConsole())
+            var configuration = new ConfigurationBuilder()
+                .AddCommandLine(args)
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
                 .Build();
 
-            host.StartAsync().Wait();
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.ConfigurationSection(configuration.GetSection("serilog"))
+                .CreateLogger();
 
-            Console.WriteLine(@"
-  _____            _     _                         _   _______        _      _____ _ _       
- |  __ \          | |   | |                       | | |__   __|      | |    / ____(_) |      
- | |  | | __ _ ___| |__ | |__   ___   __ _ _ __ __| |    | | ___  ___| |_  | (___  _| | ___  
- | |  | |/ _` / __| '_ \| '_ \ / _ \ / _` | '__/ _` |    | |/ _ \/ __| __|  \___ \| | |/ _ \ 
- | |__| | (_| \__ \ | | | |_) | (_) | (_| | | | (_| |    | |  __/\__ \ |_   ____) | | | (_) |
- |_____/ \__,_|___/_| |_|_.__/ \___/ \__,_|_|  \__,_|    |_|\___||___/\__| |_____/|_|_|\___/ 
+            var host = new OrleansSilo();
+            host.Run().Wait();
 
-");
+            Console.WriteLine(Title.Value);
             Console.WriteLine("Press Enter to close.");
             Console.ReadLine();
 
-            host.StopAsync().Wait();
-            host.Dispose();
+            host.Stop().Wait();
         }
     }
 }
